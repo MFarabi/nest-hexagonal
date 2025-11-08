@@ -1,15 +1,24 @@
 import { Controller, Post, Get, Param, Body, Patch } from '@nestjs/common';
 import { OrderService } from '../application/order.service';
 import { CreateOrderRequestDTO } from '../application/dtos/create-order-request.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateOrderCommand } from '../application/commands/create-order.command';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { CreateOrderResponseDto } from '../application/dtos/create-order-response.dto';
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Post()
+  @ApiOkResponse({ type: () => CreateOrderResponseDto })
   async create(@Body() dto: CreateOrderRequestDTO) {
-    const orderId = await this.orderService.createOrder(dto);
-    return { orderId };
+    return this.commandBus.execute(
+      new CreateOrderCommand(dto.customerId, dto.totalAmount),
+    );
   }
 
   @Get(':id')
