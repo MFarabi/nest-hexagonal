@@ -16,7 +16,7 @@ export class InMemoryOrderRepository implements IOrderRepository {
     }
 
     Logger.log(inmemEntity.id, 'InMemoryOrderRepo:GET');
-    return this._toDomain(inmemEntity);
+    return Promise.resolve(this._toDomain(inmemEntity));
   }
 
   async save(dto: OrderRepositorySaveDTO): Promise<string> {
@@ -30,7 +30,7 @@ export class InMemoryOrderRepository implements IOrderRepository {
     };
     this.store.set(dto.id, inmemEntity);
     Logger.log(inmemEntity.id, 'InMemoryOrderRepo:SAVED');
-    return inmemEntity.id;
+    return Promise.resolve(inmemEntity.id);
   }
 
   private _toDomain(order: InMemoryOrder): Order {

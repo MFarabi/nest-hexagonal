@@ -1,7 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { InMemoryOrderPersistanceModule } from './persistence/in-memory/in-memory.module';
 import { TypeormPersistanceModule } from './persistence/typeorm/typeorm.module';
-import { BootstrapConfig } from '../../app.module';
+import { BootstrapConfig } from '../order.module';
 
 @Module({})
 export class OrderInfrastructureModule {
