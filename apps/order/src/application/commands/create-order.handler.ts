@@ -1,11 +1,12 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateOrderCommand } from './create-order.command';
 import { IOrderRepository } from '../ports/order.repository';
-import { Order } from 'src/order/domain/order.entity';
 
 import { OrderRepositorySaveDTO } from '../dtos/order-repository-save.dto';
 import { CreateOrderResponseDto } from '../dtos/create-order-response.dto';
+import { Order } from '../../domain/order.entity';
 
+@CommandHandler(CreateOrderCommand)
 export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   constructor(private readonly orderRepository: IOrderRepository) {}
   async execute({

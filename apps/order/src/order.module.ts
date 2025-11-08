@@ -9,6 +9,8 @@ export type BootstrapConfig = {
   persistenceDriver: 'in-memory' | 'typeorm';
 };
 
+const CommandHandlers = [CreateOrderHandler];
+
 @Module({})
 export class OrderModule {
   static register(config: BootstrapConfig): DynamicModule {
@@ -18,7 +20,7 @@ export class OrderModule {
         CqrsModule.forRoot(),
         OrderInfrastructureModule.use(config.persistenceDriver),
       ],
-      providers: [OrderService, CreateOrderHandler],
+      providers: [OrderService, ...CommandHandlers],
       controllers: [OrderController],
     };
   }

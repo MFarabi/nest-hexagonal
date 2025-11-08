@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { OrderModule } from './order/order.module';
+import { OrderModule } from './order.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(
@@ -16,7 +16,7 @@ async function bootstrap() {
     .addTag('orders')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('swagger', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }

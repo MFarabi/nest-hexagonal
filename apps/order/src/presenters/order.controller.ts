@@ -15,7 +15,9 @@ export class OrderController {
 
   @Post()
   @ApiOkResponse({ type: () => CreateOrderResponseDto })
-  async create(@Body() dto: CreateOrderRequestDTO) {
+  async create(
+    @Body() dto: CreateOrderRequestDTO,
+  ): Promise<CreateOrderResponseDto> {
     return this.commandBus.execute(
       new CreateOrderCommand(dto.customerId, dto.totalAmount),
     );
