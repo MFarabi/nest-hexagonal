@@ -1,23 +1,41 @@
-# Use the official Node.js image as the base image
-FROM node:20
+# --------------------- STAGE 1: BUILD (order app only) ---------------------
+FROM node:20-alpine AS builder
 
-# Create and set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Install ONLY production dependencies (shared across apps)
 COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+COPY apps/order apps/order
+COPY libs libs  # if you have shared libs
 
-# Install dependencies
-RUN npm install
+# Install deps (uses package-lock.json)
+RUN npm ci
 
-# Copy the rest of the application code
-COPY . .
+# Build ONLY the 'order' app
+RUN npm run build order
 
-# Build the application
-RUN npm run build
+# --------------------- STAGE 2: RUNTIME (tiny image) ---------------------
+FROM node:20-alpine AS runtime
 
-# Expose the application port
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 nodejs && \
+    adduser -S -u 1001 -G nodejs appuser
+
+# Copy only the built app + minimal node_modules
+COPY --from=builder --chown=appuser:nodejs /app/dist/apps/order ./dist
+COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=appuser:nodejs /app/package.json ./
+
+# Optional: copy shared config if needed
+# COPY --from=builder /app/apps/order/.env ./.env
+
+USER appuser
+
 EXPOSE 23300
 
-# Define the command to run the application
-CMD ["npm", "run", "start:prod"]
+# Entry point: the compiled main.js of the 'order' app
+CMD ["node", "dist/main.js"]
