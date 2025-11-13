@@ -1,0 +1,26 @@
+name: Build and push to harbor
+
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Harbor
+        run: |
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.scanmypassport.de \
+            --username admin --password-stdin
+
+      - name: Build image
+        run: docker build -t harbor.scanmypassport.de/test/hexagonal:latest .
+
+      - name: Push image
+        run: docker push harbor.scanmypassport.de/test/hexagonal:latest
