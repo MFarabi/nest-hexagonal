@@ -16,12 +16,11 @@ jobs:
       - name: Configure Docker for insecure registry
         run: |
           sudo mkdir -p /etc/docker
-          echo '{"insecure-registries": ["harbor.scanmypassport.de:443"]}' | sudo tee /etc/docker/daemon.json
+          echo '{"insecure-registries": ["harbor.scanmypassport.de"]}' | sudo tee /etc/docker/daemon.json
           sudo systemctl restart docker
-          # Optional: Verify config (should show the insecure registry)
-          sudo jq .insecure-registries /etc/docker/daemon.json
+          echo "Docker daemon configured to allow insecure registry: harbor.scanmypassport.de"
 
-      - name: Login to Harbor (insecure)
+      - name: Login to Harbor
         run: |
           echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.scanmypassport.de \
             --username admin --password-stdin
