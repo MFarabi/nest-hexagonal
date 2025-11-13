@@ -1,6 +1,5 @@
 name: Build and push to harbor
 
-
 on:
   push:
     branches:
@@ -14,10 +13,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Login to Harbor
+      - name: Configure Docker for insecure registry
+        run: |
+          echo '{"insecure-registries": ["harbor.scanmypassport.de"]}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker
+
+      - name: Login to Harbor (insecure)
         run: |
           echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.scanmypassport.de \
-            --username admin --password-stdin
+            --username admin --password-stdin --insecure-registry
 
       - name: Build image
         run: docker build -t harbor.scanmypassport.de/test/hexagonal:latest .
